@@ -1,0 +1,7 @@
+name = "AutoCorrelation"
+uuid = "924e1082-a612-11e9-30df-abf48311f144"
+authors = ["Moelf <jerryling315@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
