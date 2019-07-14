@@ -54,9 +54,11 @@ function kenny(u::Union{Int, Float64}, N::Int, x_0::Int, alpha::Union{Int, Float
     end
 
     # Calculate the time spend in each step
-    t_sum = zeros(maximum(x)+1)
+    min_x = minimum(x)
+    max_x = maximum(x)
+    t_sum = zeros(max_x+1)
 
-    for num_x in 0:maximum(x)
+    for num_x in 0:max_x
         for j in 1:N
             if(x[j]==num_x)
                 # index starts with one, x is shifted
@@ -68,10 +70,10 @@ function kenny(u::Union{Int, Float64}, N::Int, x_0::Int, alpha::Union{Int, Float
     #@show t_sum
 
     # Mean of x given by probability of being in state x times x
-    xmean = sum([i*t_sum[i+1] for i in 1:maximum(x)]) / sum(t_sum)
+    xmean = sum([i*t_sum[i+1] for i in 1:max_x]) / sum(t_sum)
 
     # Second moment of x
-    xsq = sum([(i^2)*t_sum[i+1] for i in 1:maximum(x)]) / sum(t_sum)
+    xsq = sum([(i^2)*t_sum[i+1] for i in 1:max_x]) / sum(t_sum)
 
     # Variance of x
     xvar=xsq-xmean^2
@@ -89,18 +91,14 @@ function kenny(u::Union{Int, Float64}, N::Int, x_0::Int, alpha::Union{Int, Float
     expected=0
     # Keep track of time
     cum_t = cumsum(t)
-    t_sum_2 = zeros(maximum(x)+1,maximum(x)+1)
-    #    for i in minimum(x):(maximum(x))
-    #        for k in minimum(x):(maximum(x))
-    #time_jp=np.zeros((N,N))
+    t_sum_2 = zeros(max_x+1,max_x+1)
 
     # Using Multithreads
     # Probability that x_t=i and x_{t+u}=k
-    Threads.@threads for i in minimum(x):(maximum(x))
-        Threads.@threads for k in minimum(x):(maximum(x))
-            # time spent that is true for x_t=i and x_{t+u}=k, notice indices are shifted since i,k can be zero
-            time_jp_matrix = zeros(maximum(x)+1,maximum(x)+1)
-            # Check each step
+    # time spent that is true for x_t=i and x_{t+u}=k, notice indices are shifted since i,k can be zero
+    # Check each step
+    for i in min_x:max_x
+        for k in min_x:max_x
             for j in 1:N
                 for p in 1:N
                     # Discuss two end points of each interval
@@ -109,7 +107,6 @@ function kenny(u::Union{Int, Float64}, N::Int, x_0::Int, alpha::Union{Int, Float
                     if(j>1 && p>1)
                         indicator=( (cum_t[j-1]+u)<=(cum_t[p-1])<(cum_t[j]+u) || (cum_t[j-1]+u)<(cum_t[p])<=(cum_t[j]+u) || (cum_t[p-1])<=(cum_t[j-1]+u)<(cum_t[p]) || (cum_t[p-1])<(cum_t[j]+u)<=(cum_t[p]) )
                     end
-
 
                     if(x[j]==i && x[p]==k && j>1 && p>1 && indicator)
                         # Four cases of overlap of two intervals
@@ -157,17 +154,16 @@ function kenny(u::Union{Int, Float64}, N::Int, x_0::Int, alpha::Union{Int, Float
                         #time_jp=0
                     end
                     #t_sum_2[i,k]=t_sum_2[i,k]+time_jp
-                    time_jp_matrix[i+1, k+1] += time_jp
+                    t_sum_2[i+1, k+1] += time_jp
                 end
             end
-            t_sum_2+=time_jp_matrix
         end
     end
 
 
     # expected value, i,k times probability
-    for i in 1:maximum(x)+1
-        for k in 1:maximum(x)+1
+    for i in 1:max_x+1
+        for k in 1:max_x+1
             expected
             expected=expected+(i-1)*(k-1)*t_sum_2[i,k] #sum all elems of matrix
         end
