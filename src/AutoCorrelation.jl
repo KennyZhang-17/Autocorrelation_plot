@@ -99,10 +99,10 @@ function kenny(u::Union{Int, Float64}, x, t)
     # Probability that x_t=i and x_{t+u}=k
     # time spent that is true for x_t=i and x_{t+u}=k, notice indices are shifted since i,k can be zero
     # Check each step
-    for i in min_x:max_x
+    @inbounds for i in min_x:max_x
         for k in min_x:max_x
             for j in 1:N
-                for p in 1:N
+                @simd for p in 1:N
                     # Discuss two end points of each interval
                     time_jp = 0
                     # None edge-case, indicator shows if there time is 0
@@ -165,8 +165,8 @@ function kenny(u::Union{Int, Float64}, x, t)
 
     # expected value, i,k times probability
     for i in 1:max_x+1
-        for k in 1:max_x+1
-            expected=expected+(i-1)*(k-1)*t_sum_2[i,k] #sum all elems of matrix
+        @simd for k in 1:max_x+1
+            expected+=(i-1)*(k-1)*t_sum_2[i,k] #sum all elems of matrix
         end
     end
     expected /= sum(t_sum_2)
