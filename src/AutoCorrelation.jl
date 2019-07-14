@@ -2,34 +2,23 @@ module AutoCorrelation
 
 using Distributions
 
-export kenny
+export pre_kenny, kenny
 # Function kenny takes input u: time lag, N: Number of steps(jumps), x_0: Starting Point, alpha: increase rate (constant), 
 # beta: slope of linear decrease rate 
 # and returns the autocorrelation value for time lag u
 
 """
-    kenny(u, N, x_0, alpha, beta)
-
-`u`: time lag, `N`: Number of steps(jumps), 
 `x_0`: Starting Point, `alpha`: increase rate (constant), 
 `beta`: slope of linear decrease rate 
-
-Returns the autocorrelation value for time lag u
-
-```julia
-kenny(0, 500, 10, 1, 0.1)
-1.0622498624093526 #this is (expected - mean^2) / variance
-```
 
 External links
 * [Gollespie algorithm](https://en.wikipedia.org/wiki/Gillespie_algorithm)
 """
-function kenny(u::Union{Int, Float64}, N::Int, x_0::Int, alpha::Union{Int, Float64}, beta::Union{Int, Float64})
-
-    # Initialize x and t, first x is x_0 and last t is 0
+function pre_kenny(N, x_0, alpha, beta)
     x =zeros(Int, N+1)
     t =zeros(N+1)
 
+    # Initialize x and t, first x is x_0 and last t is 0
     x[1] = x_0
     t[N] = 0
 
@@ -52,6 +41,19 @@ function kenny(u::Union{Int, Float64}, N::Int, x_0::Int, alpha::Union{Int, Float
             x[i+1] = x[i]-1
         end
     end
+    return x, t
+end
+
+"""
+    kenny(u, x, t)
+
+`u`: time lag, `x`, `t` are sequences prepared by pre_kenny
+
+Returns the autocorrelation value for time lag u
+
+"""
+function kenny(u::Union{Int, Float64}, x, t)
+    N = x |> length
 
     # Calculate the time spend in each step
     min_x = minimum(x)
