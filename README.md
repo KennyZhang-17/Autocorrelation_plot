@@ -19,6 +19,8 @@ julia> using AutoCorrelation
 
 julia> kenny(0, 500, 10, 1, 0.1)
 1.0622498624093526 #this is (expected - mean^2) / variance
+
+help?> kenny # to access help docstring
 ```
 
-Checkout `demo` for commented usage.
+Checkout `demo` for more commented usage.

@@ -7,7 +7,23 @@ export kenny
 # beta: slope of linear decrease rate 
 # and returns the autocorrelation value for time lag u
 
-# Function declaration and argument type
+"""
+    kenny(u, N, x_0, alpha, beta)
+
+`u`: time lag, `N`: Number of steps(jumps), 
+`x_0`: Starting Point, `alpha`: increase rate (constant), 
+`beta`: slope of linear decrease rate 
+
+Returns the autocorrelation value for time lag u
+
+```julia
+kenny(0, 500, 10, 1, 0.1)
+1.0622498624093526 #this is (expected - mean^2) / variance
+```
+
+External links
+* [Gollespie algorithm](https://en.wikipedia.org/wiki/Gillespie_algorithm)
+"""
 function kenny(u::Union{Int, Float64}, N::Int, x_0::Int, alpha::Union{Int, Float64}, beta::Union{Int, Float64})
 
     # Initialize x and t, first x is x_0 and last t is 0
