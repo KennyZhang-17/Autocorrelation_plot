@@ -166,7 +166,6 @@ function kenny(u::Union{Int, Float64}, x, t)
     # expected value, i,k times probability
     for i in 1:max_x+1
         for k in 1:max_x+1
-            expected
             expected=expected+(i-1)*(k-1)*t_sum_2[i,k] #sum all elems of matrix
         end
     end
