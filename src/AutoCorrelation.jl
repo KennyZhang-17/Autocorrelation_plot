@@ -52,7 +52,7 @@ end
 Returns the autocorrelation value for time lag u
 
 """
-function kenny(u::Union{Int, Float64}, x, t)
+function kenny(u::Union{Int, Float64}, x::Array, t::Array)
     N = x |> length
 
     # Calculate the time spend in each step
@@ -99,8 +99,8 @@ function kenny(u::Union{Int, Float64}, x, t)
     # Probability that x_t=i and x_{t+u}=k
     # time spent that is true for x_t=i and x_{t+u}=k, notice indices are shifted since i,k can be zero
     # Check each step
-    @inbounds for i in min_x:max_x
-        for k in min_x:max_x
+    @inbounds for k in min_x:max_x
+        for i in min_x:max_x
             for j in 1:N
                 @simd for p in 1:N
                     # Discuss two end points of each interval
